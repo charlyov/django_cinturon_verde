@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinturon verde Purhe</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.4.0/ol.css">
+    <style>
+        #map {
+            width: 80%;
+            height: 100vh;
+        }
+        .layer-control {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: white;
+            padding: 10px;
+            border: 1px solid #ccc;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div id="map" class="map"></div>
+    <div class="layer-control">
+        <h4>Control de Capas</h4>
+        <input type="radio" name="layer" id="osm" checked>
+        <label for="osm">OpenStreetMap</label><br>
+        <input type="radio" name="layer" id="satellite">
+        <label for="satellite">Satélite</label>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/ol@v10.4.0/dist/ol.js"></script>
+    <script>
+        var osmLayer = new ol.layer.Tile({
+            source: new ol.source.OSM()
+        });
+
+        var satelliteLayer = new ol.layer.Tile({
+            source: new ol.source.XYZ({
+                url: 'https://{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png'
+            })
+        });
+
+        var map = new ol.Map({
+            target: 'map',
+            layers: [osmLayer], // Inicia con la capa OSM
+            view: new ol.View({
+                center: ol.proj.fromLonLat([-101.85, 19.6]),
+                zoom: 11
+            })
+        });
+
+        // Control de capas
+        var layerSwitcher = document.querySelectorAll('input[name="layer"]');
+        layerSwitcher.forEach(function (radio) {
+            radio.addEventListener('change', function () {
+                if (this.id === 'osm') {
+                    map.getLayers().setAt(0, osmLayer); // Cambia a la capa OSM
+                } else if (this.id === 'satellite') {
+                    map.getLayers().setAt(0, satelliteLayer); // Cambia a la capa de satélite
+                }
+            });
+        });
+    </script>
+</body>
+</html>
