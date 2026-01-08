@@ -29,9 +29,13 @@
         <label for="osm">OpenStreetMap</label><br>
         <input type="radio" name="layer" id="satellite">
         <label for="satellite">Satélite</label>
+        <input type="radio" name="layer" id="geojson">
+        <label for="geojson">comunidades</label>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/ol@v10.4.0/dist/ol.js"></script>
     <script>
+
+//mapas base
         var osmLayer = new ol.layer.Tile({
             source: new ol.source.OSM()
         });
@@ -42,26 +46,53 @@
             })
         });
 
+// Capas
+        var geojsonLayer = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                url: '/static/app_cv/js/pys_comunidades.geojson', 
+                format: new ol.format.GeoJSON()
+            }),
+            style: new ol.style.Style({
+                fill: new ol.style.Fill({
+                    color: 'rgba(255, 255, 255, 0.6)'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: '#319FD3',
+                    width: 1
+                })
+            })
+        });
+
+
+//mapa
         var map = new ol.Map({
             target: 'map',
-            layers: [osmLayer], // Inicia con la capa OSM
+            layers: [osmLayer], // OSM por defecto
             view: new ol.View({
                 center: ol.proj.fromLonLat([-101.85, 19.6]),
                 zoom: 11
             })
         });
 
-        // Control de capas
+// Control de capas
         var layerSwitcher = document.querySelectorAll('input[name="layer"]');
         layerSwitcher.forEach(function (radio) {
             radio.addEventListener('change', function () {
                 if (this.id === 'osm') {
-                    map.getLayers().setAt(0, osmLayer); // Cambia a la capa OSM
+                    map.getLayers().setAt(0, osmLayer);
                 } else if (this.id === 'satellite') {
-                    map.getLayers().setAt(0, satelliteLayer); // Cambia a la capa de satélite
+                    map.getLayers().setAt(0, satelliteLayer);
+
+                } else if (this.id === 'geojson') {
+                    // Agregar la capa GeoJSON
+                    if (!map.getLayers().getArray().includes(geojsonLayer)) {
+                        map.addLayer(geojsonLayer);
+                    }
+                    map.getLayers().setAt(0, geojsonLayer); // Cambia a la capa GeoJSON
                 }
             });
         });
+
     </script>
 </body>
 </html>
